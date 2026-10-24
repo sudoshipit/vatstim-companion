@@ -1,6 +1,6 @@
 # vatstim-companion
 
-A standalone **vPilot → Telegram** plugin for private-message notifications, replies, SELCAL alerts, and confirmed remote disconnect. It works independently of aircraft type. Version **0.2.2**.
+A standalone **vPilot → Telegram** plugin for private-message notifications, replies, SELCAL alerts, and confirmed remote disconnect. Version **0.2.2**.
 
 There is no web dashboard, Node.js service, SimConnect connector, inbound port, or automatic VATSIM reconnection. Telegram uses outbound HTTPS polling while vPilot is running.
 

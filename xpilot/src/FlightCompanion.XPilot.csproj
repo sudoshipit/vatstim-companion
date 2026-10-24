@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>FlightCompanion.XPilot</AssemblyName>
+    <RootNamespace>FlightCompanion.XPilot</RootNamespace>
+    <Version>0.3.0</Version>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <DebugType>none</DebugType>
+    <OutputPath>../release/</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../sdk/xPilot.PluginSdk.csproj" Private="false" />
+    <InternalsVisibleTo Include="FlightCompanion.XPilot.Tests" />
+  </ItemGroup>
+</Project>

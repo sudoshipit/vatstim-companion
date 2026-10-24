@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>FlightCompanion.XPilot.Setup</AssemblyName>
+    <Version>0.3.0</Version>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UseAppHost>false</UseAppHost>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../src/Settings.cs" Link="Settings.cs" />
+    <Compile Include="../src/TelegramApi.cs" Link="TelegramApi.cs" />
+    <InternalsVisibleTo Include="FlightCompanion.XPilot.Setup.Tests" />
+  </ItemGroup>
+</Project>

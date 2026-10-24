@@ -1,0 +1,13 @@
+{
+  "Enabled": false,
+  "BotToken": "",
+  "BotTokenEnvironmentVariable": "FLIGHT_COMPANION_XPILOT_TELEGRAM_TOKEN",
+  "AllowedChatId": "",
+  "AllowedUserId": "",
+  "AllowReplies": false,
+  "AllowDisconnect": false,
+  "ForwardPrivateMessages": true,
+  "ForwardSelcal": true,
+  "ForwardRadioMessages": false,
+  "RadioOnlyWhenCallsignMentioned": true
+}

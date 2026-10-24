@@ -7,7 +7,7 @@ if (-not (Test-Path -LiteralPath $pluginPath)) { throw 'Run Build.cmd and Build-
 $packageVersion = [Reflection.AssemblyName]::GetAssemblyName($pluginPath).Version.ToString(3)
 $distPath = Join-Path $packageRoot 'dist'
 [IO.Directory]::CreateDirectory($distPath) | Out-Null
-$zipName = 'vatstim-companion-v' + $packageVersion + '.zip'
+$zipName = 'vatstim-companion-vpilot-v' + $packageVersion + '.zip'
 $zipPath = Join-Path $distPath $zipName
 $temporaryZip = Join-Path $distPath ($zipName + '.tmp-' + [Guid]::NewGuid().ToString('N'))
 

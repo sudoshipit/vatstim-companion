@@ -1,0 +1,14 @@
+# Local credentials and runtime state
+**/FlightCompanion.Plugin.json
+.env
+.env.*
+*.user
+Untitled*
+# Generated build and distribution outputs
+/release/*
+/tests/bin/
+/setup/*.exe
+/setup/*-status.txt
+/setup/replace-probe/
+/dist/
+.vs/

@@ -1,5 +1,12 @@
 # Changelog
 
+## vPilot 0.2.3
+
+- Add an installation picker for vPilot on any drive, including custom paths with spaces, and use the same location when launching.
+- Remove personal setup-history wording from the helper and use generic documentation.
+- Ship one setup EXE with the plugin embedded, Start-link pairing and an encrypted token that works with normal launches.
+- Validate 51 plugin tests and 29 setup-helper tests. xPilot runtime remains version 0.3.0.
+
 ## 0.3.0
 
 - Separate the existing vPilot product into `vpilot/` and the new xPilot product into `xpilot/`.

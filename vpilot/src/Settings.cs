@@ -1,12 +1,15 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Text;
+using System.Security.Cryptography;
 using System.Web.Script.Serialization;
 
 namespace FlightCompanion {
   public sealed class PluginSettings {
     public bool Enabled { get; set; }
     public string BotToken { get; set; }
+    public string ProtectedBotToken { get; set; }
     public string BotTokenEnvironmentVariable { get; set; }
     public string AllowedChatId { get; set; }
     public string AllowedUserId { get; set; }
@@ -17,7 +20,7 @@ namespace FlightCompanion {
     public bool ForwardRadioMessages { get; set; }
     public bool RadioOnlyWhenCallsignMentioned { get; set; }
     public PluginSettings() {
-      BotToken="";BotTokenEnvironmentVariable="FLIGHT_COMPANION_TELEGRAM_TOKEN";
+      BotToken="";ProtectedBotToken="";BotTokenEnvironmentVariable="FLIGHT_COMPANION_TELEGRAM_TOKEN";
       AllowedChatId=""; AllowedUserId="";
       ForwardPrivateMessages=true; ForwardSelcal=true; RadioOnlyWhenCallsignMentioned=true;
     }
@@ -27,6 +30,7 @@ namespace FlightCompanion {
          !Regex.IsMatch(AllowedUserId??"",@"^[1-9][0-9]*$")||!Int64.TryParse(AllowedUserId,out user))
         throw new InvalidDataException("Explicit private Telegram chat and user IDs are required.");
       if(!String.IsNullOrWhiteSpace(BotToken)) { ValidateToken(BotToken.Trim());return; }
+      if(!String.IsNullOrWhiteSpace(ProtectedBotToken)){ReadToken();return;}
       if(!Regex.IsMatch(BotTokenEnvironmentVariable??"",@"^[A-Za-z_][A-Za-z0-9_]{0,127}$"))
         throw new InvalidDataException("Invalid token environment-variable name.");
     }
@@ -34,11 +38,24 @@ namespace FlightCompanion {
       // An explicitly configured JSON token takes precedence. A malformed explicit
       // value fails closed instead of silently authenticating a different bot.
       if(!String.IsNullOrWhiteSpace(BotToken)) {string configured=BotToken.Trim();ValidateToken(configured);return configured;}
+      if(!String.IsNullOrWhiteSpace(ProtectedBotToken)) {
+        byte[] bytes=null;
+        try {
+          bytes=ProtectedData.Unprotect(Convert.FromBase64String(ProtectedBotToken),null,DataProtectionScope.CurrentUser);
+          string saved=Encoding.UTF8.GetString(bytes);ValidateToken(saved);return saved;
+        }catch {throw new InvalidDataException("The saved Telegram token could not be read. Run setup again under this Windows account.");}
+        finally {if(bytes!=null)Array.Clear(bytes,0,bytes.Length);}
+      }
       if(!Regex.IsMatch(BotTokenEnvironmentVariable??"",@"^[A-Za-z_][A-Za-z0-9_]{0,127}$"))
         throw new InvalidDataException("Invalid token environment-variable name.");
       string token=Environment.GetEnvironmentVariable(BotTokenEnvironmentVariable);
       ValidateToken(token);
       return token;
+    }
+    internal static string ProtectToken(string token) {
+      ValidateToken(token);byte[] bytes=Encoding.UTF8.GetBytes(token);
+      try{return Convert.ToBase64String(ProtectedData.Protect(bytes,null,DataProtectionScope.CurrentUser));}
+      finally{Array.Clear(bytes,0,bytes.Length);}
     }
     static void ValidateToken(string token) {
       if(!Regex.IsMatch(token??"",@"^[0-9]+:[A-Za-z0-9_-]{20,}$"))

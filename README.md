@@ -4,12 +4,12 @@ Telegram companions for **vPilot** and **xPilot**, in separate folders with sepa
 
 | Version | Folder and setup guide | Compatibility | Verification |
 | --- | --- | --- | --- |
-| vPilot 0.2.2 | [vpilot/](vpilot/README.md) | Windows; vPilot 3.12.1; .NET Framework 4.8 | 46 plugin + 15 setup tests; basic live initialization previously observed |
+| vPilot 0.2.3 | [vpilot/](vpilot/README.md) | Windows; vPilot 3.12.1; .NET Framework 4.8 | 51 plugin + 29 setup tests; one-EXE setup and custom installation paths |
 | xPilot 0.3.0 | [xpilot/](xpilot/README.md) | **xPilot 4**, plugin API **0.1.0.0**, .NET 10 | 50 plugin + 18 setup tests; **not yet tested inside a live xPilot client** |
 
 Both versions provide private-message notifications, replies to recent private notifications, SELCAL alerts, optional receive-only radio notifications and confirmed remote disconnect. Send `/disconnect`, then plain `/confirm` within 60 seconds. A confirmation is single-use for that pending request; after reconnecting manually, you can request again. No code needs copying.
 
-Download the matching **vpilot** or **xpilot** ZIP from [Releases](https://github.com/sudoshipit/vatstim-companion/releases). Each folder's README covers Telegram setup, installation, configuration, commands, troubleshooting and local builds. The vPilot installer does not install the xPilot version.
+For vPilot, download the standalone [FlightCompanion.Setup.exe](https://github.com/sudoshipit/vatstim-companion/releases/download/v0.2.3/FlightCompanion.Setup.exe). It includes the plugin and remembers your token securely for normal launches. A manual-install ZIP is also available. For xPilot, use the **xpilot** ZIP from [Releases](https://github.com/sudoshipit/vatstim-companion/releases). Each folder's README covers setup, commands, troubleshooting and local builds. The vPilot installer does not install the xPilot version.
 
 Use a **different Telegram bot for each client if both will run**. Telegram permits only one polling application per bot. Copying a token into two active clients will cause conflicts. The configuration files and environment-variable names are separate.
 

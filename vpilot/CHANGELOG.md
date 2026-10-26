@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.3
+
+- Let setup browse for vPilot.exe or accept an installation folder on any drive. Validate the chosen executable, SDK and supported version before installation.
+- Install and launch from the same selected location; create the Plugins folder when needed. Preserve existing plugin backups and refuse installation or launch while vPilot is running.
+- Use generic setup prompts and documentation without references to an individual user's setup history.
+- Provide a standalone setup EXE with the plugin embedded, Telegram Start-link pairing and Windows-encrypted token storage. Normal vPilot launches need no JSON editing or repeat setup.
+- Refuse pairing while vPilot is running so setup cannot compete with the active bot poller.
+- Validate with 51 plugin tests and 29 setup-helper tests.
+
 ## 0.2.2
 
 - Confirm a pending remote disconnect using `/confirm`, with no copied code.

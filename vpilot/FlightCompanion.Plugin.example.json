@@ -1,6 +1,7 @@
 {
   "Enabled": false,
   "BotToken": "",
+  "ProtectedBotToken": "",
   "BotTokenEnvironmentVariable": "FLIGHT_COMPANION_TELEGRAM_TOKEN",
   "AllowedChatId": "",
   "AllowedUserId": "",

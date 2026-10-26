@@ -74,6 +74,23 @@ class Tests {
   static void Bind(BridgeEngine engine,long id=88){engine.Receive("private","TEST_CTR","Test private message");Notification n;while((n=engine.TakeNotification())!=null)if(n.Kind=="private"){engine.BindReply(id,n);return;}throw new Exception("No private notification");}
   static BrokerAction Disconnect(BridgeEngine engine,Clock clock,long id=1){engine.Handle(Update(clock,id,"/disconnect"));return engine.Handle(Update(clock,id+1,"/confirm")).Action;}
   static int Main(){
+    Test("encrypted token survives configuration save and normal reload",()=>{
+      const string token="123456:ABCDEFGHIJKLMNOPQRSTUVWX";var c=Config();c.ProtectedBotToken=PluginSettings.ProtectToken(token);
+      string json=new JavaScriptSerializer().Serialize(c);Assert(!json.Contains(token));
+      var loaded=new JavaScriptSerializer().Deserialize<PluginSettings>(json);loaded.Validate();Assert(loaded.ReadToken()==token);
+    });
+    Test("protected token takes precedence over environment fallback",()=>{
+      const string token="123456:ABCDEFGHIJKLMNOPQRSTUVWX";var c=Config();c.ProtectedBotToken=PluginSettings.ProtectToken(token);c.BotTokenEnvironmentVariable="FC_NOT_PRESENT_"+Guid.NewGuid().ToString("N");c.Validate();Assert(c.ReadToken()==token);
+    });
+    Test("manual plaintext token can override a saved protected token",()=>{
+      var c=Config();c.ProtectedBotToken="broken";c.BotToken="123456:ABCDEFGHIJKLMNOPQRSTUVWX";c.Validate();Assert(c.ReadToken()==c.BotToken);
+    });
+    Test("corrupt encrypted token fails closed with a redacted setup instruction",()=>{
+      var c=Config();c.ProtectedBotToken="SECRET-INVALID-CIPHERTEXT";
+      try{c.ReadToken();throw new Exception("Unexpected token acceptance");}catch(System.IO.InvalidDataException ex){Assert(ex.Message.Contains("setup again")&&!ex.ToString().Contains(c.ProtectedBotToken));}
+      Throws(c.Validate);c.ProtectedBotToken=Convert.ToBase64String(new byte[]{1,2,3});Throws(()=>c.ReadToken());
+    });
+    Test("malformed tokens cannot be saved as encrypted credentials",()=>Throws(()=>PluginSettings.ProtectToken("bad")));
     Test("disabled configuration opens no transport and registers no handlers",()=>{using(var f=new Fixture(new PluginSettings())){Assert(f.Plugin.Engine==null);Assert(f.Api.Offsets.Count==0&&f.Api.SendAttempts==0);Assert(f.Broker.HandlerCount==0);}});
     Test("configuration requires explicit positive private-chat and user IDs",()=>{var c=Config();c.AllowedChatId="-123";Throws(c.Validate);c=Config();c.AllowedUserId="";Throws(c.Validate);c=Config();c.BotTokenEnvironmentVariable="BAD NAME";Throws(c.Validate);});
     Test("missing token fails closed without storing credentials",()=>{var c=Config();c.BotTokenEnvironmentVariable="FC_ABSENT_TEST_"+Guid.NewGuid().ToString("N");Throws(()=>c.ReadToken());});

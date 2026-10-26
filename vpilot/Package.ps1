@@ -25,7 +25,7 @@ foreach ($entry in $entries) {
     if (-not (Test-Path -LiteralPath (Join-Path $packageRoot $entry))) { throw ('Missing release file: ' + $entry) }
 }
 $example = Get-Content -LiteralPath (Join-Path $packageRoot 'release\FlightCompanion.Plugin.example.json') -Raw | ConvertFrom-Json
-if ($example.Enabled -or $example.BotToken -or $example.AllowedChatId -or $example.AllowedUserId) {
+if ($example.Enabled -or $example.BotToken -or $example.ProtectedBotToken -or $example.AllowedChatId -or $example.AllowedUserId) {
     throw 'Release example must be disabled and contain no token or personal IDs.'
 }
 try {
@@ -43,3 +43,8 @@ try {
 $checksum = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
 [IO.File]::WriteAllText($zipPath + '.sha256', $checksum + '  ' + $zipName + [Environment]::NewLine, [Text.Encoding]::ASCII)
 Write-Output ('Packaged ' + $zipName + ' with ' + $entries.Count + ' allowlisted entries.')
+$standalonePath = Join-Path $distPath 'FlightCompanion.Setup.exe'
+Copy-Item -LiteralPath (Join-Path $packageRoot 'setup\FlightCompanion.Setup.exe') -Destination $standalonePath -Force
+$setupChecksum = (Get-FileHash -LiteralPath $standalonePath -Algorithm SHA256).Hash.ToLowerInvariant()
+[IO.File]::WriteAllText($standalonePath + '.sha256', $setupChecksum + '  FlightCompanion.Setup.exe' + [Environment]::NewLine, [Text.Encoding]::ASCII)
+Write-Output 'Packaged standalone FlightCompanion.Setup.exe and checksum.'

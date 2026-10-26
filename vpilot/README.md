@@ -1,6 +1,6 @@
 # Flight Companion for vPilot
 
-A standalone **vPilot to Telegram** plugin for private-message notifications, replies, SELCAL alerts, and confirmed remote disconnect. Version **0.2.2**.
+A standalone **vPilot to Telegram** plugin for private-message notifications, replies, SELCAL alerts, and confirmed remote disconnect. Version **0.2.3**.
 
 There is no web dashboard, Node.js service, SimConnect connector, inbound port, or automatic VATSIM reconnection. Telegram uses outbound HTTPS polling while vPilot is running.
 
@@ -12,28 +12,29 @@ There is no web dashboard, Node.js service, SimConnect connector, inbound port, 
 
 This is an independent, experimental plugin, not an official vPilot or VATSIM product. Telegram does not replace VATSIM attendance and prompt-response requirements.
 
-## Quick setup — no compiling required
+## Quick setup — one EXE
 
-1. Download the **vpilot** ZIP from this repository's **Releases** page and extract the entire ZIP. Keep its `release` and `setup` folders together.
-2. In Telegram, open [@BotFather](https://t.me/BotFather), send `/newbot`, and follow the prompts. Keep the resulting bot token private. Open your new bot's private chat and tap **Start**.
-3. **Close vPilot at a suitable time.** Run `setup\FlightCompanion.Setup.exe`. Paste the token into its masked field and click **Verify bot and pair**.
-4. Send the exact random pairing text shown by the helper to your bot in a **private chat**. It expires after five minutes. The helper discovers your chat and user IDs; there is no need to obtain them through another bot.
-5. Choose whether to enable **private replies** and **remote disconnect**, then click **Install**. The helper installs the DLL and a configuration restricted to the paired chat/user. It preserves unrelated plugins and backs up any previous Flight Companion files.
-6. Choose how the token should be supplied:
-   - **Normal vPilot launches:** open `%LOCALAPPDATA%\vPilot\Plugins\FlightCompanion.Plugin.json` in a text editor and put the token in `BotToken`. Save, close the setup helper, and start vPilot using your usual shortcut. The token is saved in plain text in this local file; do not share or commit it.
-   - **Memory only:** leave `BotToken` empty and click **Launch vPilot with this token** in the helper. It passes the token to that vPilot process only. A later normal launch will not retain it; repeat the helper flow or use the environment-variable option below.
-7. After vPilot starts, wait a few seconds and send a **fresh `/status`** to your bot. Confirm that polling is healthy. Connect vPilot to VATSIM manually when ready, then check `/status` again.
+1. Download [FlightCompanion.Setup.exe](https://github.com/sudoshipit/vatstim-companion/releases/download/v0.2.3/FlightCompanion.Setup.exe). The plugin is included; no ZIP extraction or other files are required. **Close vPilot when convenient**, then run setup under the Windows account you use for vPilot.
+2. Check the vPilot location. If installed on D: or another custom path, click **Browse** and select `vPilot.exe`, or paste its installation folder.
+3. Paste your bot token and click **Connect Telegram**. To create a bot first, use **Create a bot** to open [@BotFather](https://t.me/BotFather), send `/newbot`, and follow its prompts.
+4. Click **Open Telegram** and press **Start** in your bot's private chat. The helper verifies the one-time link and discovers your chat/user IDs. If the link is unavailable, send the displayed pairing code instead. Pairing expires after five minutes.
+5. Choose the optional reply/disconnect controls and click **Install Flight Companion**, then **Open vPilot** or use your usual shortcut. Setup remembers your token, encrypted for your Windows account. **No JSON editing or repeat pairing is needed for normal launches.**
 
-The helper assumes the default install path `%LOCALAPPDATA%\vPilot` and checks for version 3.12.1.0. For a custom installation, use the manual instructions below. Windows may identify this independently built helper as an unsigned application; review the repository source/build process if your system blocks it.
+After vPilot starts, send a fresh `/status` to your bot. Connect to VATSIM manually when ready. Setup never sends VATSIM messages or disconnect commands. A running vPilot blocks pairing and installation to avoid interfering with its Telegram connection.
 
-## The token field that matters
+The helper starts with `%LOCALAPPDATA%\vPilot` as a suggestion and supports installations on any drive through **Browse**. Both installation and launch use the selected location. A missing `Plugins` folder is created, and the selected path is locked after a successful installation. The version check remains 3.12.1.0. Setup never closes a running vPilot. Windows may identify this independently built helper as an unsigned application; review the repository source/build process if your system blocks it.
 
-Use the installed **`FlightCompanion.Plugin.json`**, not the example file in your download:
+## Advanced token configuration (optional)
+
+The setup EXE handles configuration automatically. It saves the token in `ProtectedBotToken` using Windows DPAPI for the current user, leaving plaintext `BotToken` empty. If moving to a different Windows account or computer, run setup there again. The configuration is in `Plugins\FlightCompanion.Plugin.json` under the selected vPilot folder (for example, `D:\Apps\vPilot\Plugins\FlightCompanion.Plugin.json`).
+
+Manual plaintext/environment configuration remains supported. Use the installed **`FlightCompanion.Plugin.json`**, not the example file in your download:
 
 ```json
 {
   "Enabled": true,
   "BotToken": "PASTE_YOUR_BOT_TOKEN_HERE",
+  "ProtectedBotToken": "",
   "BotTokenEnvironmentVariable": "FLIGHT_COMPANION_TELEGRAM_TOKEN",
   "AllowedChatId": "YOUR_PRIVATE_CHAT_ID",
   "AllowedUserId": "YOUR_USER_ID",
@@ -46,7 +47,7 @@ Use the installed **`FlightCompanion.Plugin.json`**, not the example file in you
 }
 ```
 
-Replace the placeholders; the setup helper fills in your actual allowed IDs. Keep the IDs in quotes. **Do not put the actual token in `BotTokenEnvironmentVariable`**: that field contains a variable *name*. `BotToken` takes precedence when populated. A malformed explicit token fails closed rather than falling back to a different bot.
+For manual configuration, replace the placeholders and keep IDs in quotes. **Do not put the actual token in `BotTokenEnvironmentVariable`**: that field contains a variable *name*. Precedence is plaintext `BotToken`, then `ProtectedBotToken`, then the environment variable. Invalid configured credentials fail closed instead of falling back to another source. Do not manually edit the encrypted value.
 
 Configuration is read once at startup. Restart vPilot at a suitable time after changing it. Load the plugin before manually connecting to VATSIM.
 
@@ -73,6 +74,7 @@ Private replies must target a private notification from the current connection w
 | --- | --- | --- |
 | `Enabled` | `false` | Enables the plugin only with valid configuration. |
 | `BotToken` | empty | Optional token saved in JSON; takes precedence over the environment source. |
+| `ProtectedBotToken` | empty | Windows-encrypted token written by setup; used when `BotToken` is empty. Requires the same Windows account. |
 | `BotTokenEnvironmentVariable` | `FLIGHT_COMPANION_TELEGRAM_TOKEN` | Process environment variable name used when `BotToken` is empty. |
 | `AllowedChatId` | empty | One explicit positive private chat ID. |
 | `AllowedUserId` | empty | One explicit positive user ID; both IDs must match. |
@@ -92,7 +94,7 @@ Private replies must target a private notification from the current connection w
 
 Do not copy the source repository's test binaries or vendor SDK files into the Plugins folder. The ZIP contains only the plugin, example configuration, optional helper and documentation.
 
-For environment-only mode, leave `BotToken` blank and launch from **PowerShell 7**:
+For environment-only mode, leave both `BotToken` and `ProtectedBotToken` blank and launch from **PowerShell 7**:
 
 ```powershell
 $env:FLIGHT_COMPANION_TELEGRAM_TOKEN = Read-Host 'Telegram bot token' -MaskInput
@@ -100,16 +102,20 @@ Start-Process "$env:LOCALAPPDATA\vPilot\vPilot.exe"
 Remove-Item Env:\FLIGHT_COMPANION_TELEGRAM_TOKEN
 ```
 
-The prompt avoids putting the token in shell history. This does not save a permanent environment variable. `-MaskInput` requires PowerShell 7; use the masked helper on older PowerShell versions.
+The prompt avoids putting the token in shell history. This does not save a permanent environment variable. `-MaskInput` requires PowerShell 7. Most users should use the setup EXE instead.
+
+For a custom installation, replace the executable path in `Start-Process` with your selected `vPilot.exe` path.
 
 ## Troubleshooting
 
 | Symptom | Check |
 | --- | --- |
-| No replies after restarting vPilot | If you used memory-only setup, a normal restart loses the token. Save it in `BotToken` or supply it through the environment again. |
+| Setup cannot find vPilot, or vPilot is installed on D: | Use setup 0.2.3 or later. Click **Browse** at the top and select the installed `vPilot.exe`. |
+| No replies after restarting vPilot with an older setup | Run setup 0.2.3 once to save an encrypted token that works with normal launches. |
+| Saved token cannot be read after changing PCs or Windows accounts | Run setup again under the account that runs vPilot. |
 | Token was pasted into JSON but the bot is silent | Use plugin 0.2.1 or later, put the token in **`BotToken`**, keep `BotTokenEnvironmentVariable` as a name, and restart. |
 | No response to old `/status` messages | Startup backlog is deliberately skipped. Wait a few seconds after startup and send a fresh command. |
-| Still no response | Check `Enabled`, valid JSON, the actual installed config filename, both allowlists, the current non-revoked token and internet connectivity. vPilot's debug log contains redacted initialization errors. |
+| Still no response | Check `Enabled`, valid JSON, the actual installed config filename, both allowlists, a valid token and internet connectivity. vPilot's debug log contains redacted initialization errors. |
 | “Disconnected / no connection event observed” | Connect vPilot manually after plugin startup. The SDK provides events rather than a current-state query. |
 | Replies or disconnect show disabled | Enable their separate settings and restart. If `/status` reports no UI synchronization context, this vPilot runtime can only receive notifications; commands fail closed. |
 | Setup reports another poller/webhook | Use a dedicated bot. Stop the other poller; only the bot owner should remove a pre-existing webhook. The helper never changes webhook settings. |
@@ -135,14 +141,14 @@ For a non-default vPilot path, pass it to `Build.cmd` and `Test.cmd`:
 .\Test.cmd 'D:\Apps\vPilot'
 ```
 
-Build outputs go to `release` and `setup`; the ZIP and checksum go to `dist`. The package script includes an explicit file list, so runtime configuration, tokens, scratch scripts, SDK binaries and test outputs cannot be swept into the release accidentally.
+Build outputs go to `release` and `setup`; the standalone setup EXE, optional manual-install ZIP and their checksums go to `dist`. `Build-Setup.cmd` builds and embeds the plugin. The package script includes an explicit file list, so runtime configuration, tokens, scratch scripts, SDK binaries and test outputs cannot be swept into the release accidentally.
 
-Current validation: **46 plugin tests + 15 helper tests**. All command tests use a mocked broker and fake Telegram transport. See [VERIFICATION.md](VERIFICATION.md) for what these checks establish and their limits.
+Current validation: **51 plugin tests + 29 helper tests**. All command tests use a mocked broker and fake Telegram transport. See [VERIFICATION.md](VERIFICATION.md) for what these checks establish and their limits.
 
 ## Privacy and behavior limits
 
-- The installed `FlightCompanion.Plugin.json` is ignored by Git. A JSON token is plain text; never upload that file or token screenshots. Revoke a token in BotFather if it is exposed.
-- Token values, message contents and token-bearing request URLs are not logged by the plugin. The setup helper itself never saves a token.
+- The installed `FlightCompanion.Plugin.json` is ignored by Git. Setup encrypts the token with Windows DPAPI; manually entered `BotToken` values are plaintext. Keep the configuration and backups private.
+- Token values, message contents and token-bearing request URLs are not logged. Setup saves only the Windows-encrypted token, not its plaintext value.
 - Enabling forwarding shares selected message content with Telegram. Bot messages are not end-to-end encrypted.
 - Groups, bots, forwarded commands, stale updates, replayed updates and unsupported commands are rejected. Session changes invalidate reply targets and disconnect requests.
 - No automatic reconnect or unattended-flight behavior is provided. Follow the [VATSIM Code of Conduct](https://vatsim.net/docs/policy/code-of-conduct/).

@@ -7,7 +7,7 @@ set "FC_SDK=%VPILOT_PATH%\RossCarlson.Vatsim.Vpilot.Plugins.dll"
 if not exist "%FC_COMPILER%" (echo Missing .NET Framework C# compiler. & exit /b 1)
 if not exist "%FC_SDK%" (echo Missing vPilot SDK. Pass the installed vPilot directory to Build.cmd. & exit /b 1)
 if not exist "%~dp0release" mkdir "%~dp0release"
-"%FC_COMPILER%" /nologo /target:library /platform:anycpu /warnaserror+ /optimize+ /out:"%~dp0release\FlightCompanion.Plugin.dll" /reference:"%FC_SDK%" /reference:System.Net.Http.dll /reference:System.Web.Extensions.dll "%~dp0src\*.cs"
+"%FC_COMPILER%" /nologo /target:library /platform:anycpu /warnaserror+ /optimize+ /out:"%~dp0release\FlightCompanion.Plugin.dll" /reference:"%FC_SDK%" /reference:System.Net.Http.dll /reference:System.Web.Extensions.dll /reference:System.Security.dll "%~dp0src\*.cs"
 if errorlevel 1 exit /b 1
 copy /y "%~dp0FlightCompanion.Plugin.example.json" "%~dp0release\FlightCompanion.Plugin.example.json" >nul
 echo Built release\FlightCompanion.Plugin.dll against your installed vPilot SDK.

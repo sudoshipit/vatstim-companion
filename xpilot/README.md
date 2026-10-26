@@ -163,7 +163,7 @@ Validation: **50 plugin tests + 18 setup/transport tests**, all mocked. See [VER
 
 ## Privacy and references
 
-Forwarding shares selected messages with Telegram; bots are not end-to-end encrypted. Never commit a live JSON config, token or token screenshot. Revoke exposed tokens through BotFather. There is no web server, inbound port or automatic VATSIM reconnection. Stay present and available to ATC under the [VATSIM Code of Conduct](https://vatsim.net/docs/policy/code-of-conduct/).
+Forwarding shares selected messages with Telegram; bots are not end-to-end encrypted. Never commit a live JSON config, token or token screenshot. There is no web server, inbound port or automatic VATSIM reconnection. Stay present and available to ATC under the [VATSIM Code of Conduct](https://vatsim.net/docs/policy/code-of-conduct/).
 
 - [Official xPilot plugin developer guide](https://xpilot.app/docs/plugins)
 - [Official SDK and license](https://github.com/xpilot-project/plugin-sdk)
